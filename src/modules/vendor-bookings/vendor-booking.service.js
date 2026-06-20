@@ -1,5 +1,8 @@
 const db = require('../../config/db');
 
+/**
+ * GET ALL BOOKINGS FOR A VENDOR
+ */
 exports.getVendorBookings = async (vendorId) => {
 
   const [rows] = await db.query(
@@ -17,8 +20,7 @@ exports.getVendorBookings = async (vendorId) => {
       u.last_name,
       u.email
     FROM bookings b
-    LEFT JOIN users u
-      ON u.id = b.user_id
+    LEFT JOIN users u ON u.id = b.user_id
     WHERE b.vendor_id = ?
     ORDER BY b.id DESC
     `,
@@ -28,17 +30,37 @@ exports.getVendorBookings = async (vendorId) => {
   return rows;
 };
 
-exports.approveBooking = async (
-  bookingId,
-  vendorId
-) => {
+/**
+ * GET SINGLE BOOKING
+ */
+exports.getBookingById = async (bookingId, vendorId) => {
+
+  const [[booking]] = await db.query(
+    `
+    SELECT *
+    FROM bookings
+    WHERE id = ? AND vendor_id = ?
+    `,
+    [bookingId, vendorId]
+  );
+
+  if (!booking) {
+    throw new Error('Booking not found');
+  }
+
+  return booking;
+};
+
+/**
+ * APPROVE BOOKING
+ */
+exports.approveBooking = async (bookingId, vendorId) => {
 
   const [result] = await db.query(
     `
     UPDATE bookings
-    SET status='confirmed'
-    WHERE id = ?
-    AND vendor_id = ?
+    SET status = 'confirmed'
+    WHERE id = ? AND vendor_id = ?
     `,
     [bookingId, vendorId]
   );
@@ -53,79 +75,16 @@ exports.approveBooking = async (
   };
 };
 
-exports.getBookingById = async (
-  bookingId,
-  vendorId
-) => {
-
-  const [[booking]] = await db.query(
-    `
-    SELECT *
-    FROM bookings
-    WHERE id = ?
-    AND vendor_id = ?
-    `,
-    [bookingId, vendorId]
-  );
-
-  if (!booking) {
-    throw new Error('Booking not found');
-  }
-
-  return booking;
-};
-
-exports.updateBookingStatus = async (
-  bookingId,
-  vendorId,
-  status
-) => {
-
-  const allowedStatuses = [
-    'confirmed',
-    'cancelled',
-    'completed'
-  ];
-
-  if (!allowedStatuses.includes(status)) {
-    throw new Error('Invalid booking status');
-  }
+/**
+ * REJECT BOOKING
+ */
+exports.rejectBooking = async (bookingId, vendorId) => {
 
   const [result] = await db.query(
     `
     UPDATE bookings
-    SET status = ?
-    WHERE id = ?
-    AND vendor_id = ?
-    `,
-    [
-      status,
-      bookingId,
-      vendorId
-    ]
-  );
-
-  if (result.affectedRows === 0) {
-    throw new Error('Booking not found');
-  }
-
-  return {
-    booking_id: bookingId,
-    status
-  };
-};
-
-exports.rejectBooking = async (
-  bookingId,
-  vendorId
-) => {
-
-  const [result] = await db.query(
-    `
-    UPDATE bookings
-    SET status='cancelled'
-    WHERE id = ?
-    AND vendor_id = ?
+    SET status = 'cancelled'
+    WHERE id = ? AND vendor_id = ?
     `,
     [bookingId, vendorId]
   );
@@ -137,5 +96,63 @@ exports.rejectBooking = async (
   return {
     booking_id: bookingId,
     status: 'cancelled'
+  };
+};
+
+/**
+ * UPDATE BOOKING STATUS (SAFE FLOW CONTROL)
+ */
+exports.updateBookingStatus = async (
+  bookingId,
+  vendorId,
+  status
+) => {
+
+  const allowedStatuses = [
+    'confirmed',
+    'checked_in',
+    'completed',
+    'cancelled'
+  ];
+
+  if (!allowedStatuses.includes(status)) {
+    throw new Error('Invalid booking status');
+  }
+
+  const [[booking]] = await db.query(
+    `
+    SELECT *
+    FROM bookings
+    WHERE id = ? AND vendor_id = ?
+    `,
+    [bookingId, vendorId]
+  );
+
+  if (!booking) {
+    throw new Error('Booking not found');
+  }
+
+  // RULES
+  if (status === 'checked_in' && booking.status !== 'confirmed') {
+    throw new Error('Only confirmed bookings can be checked in');
+  }
+
+  if (status === 'completed' && booking.status !== 'checked_in') {
+    throw new Error('Guest must be checked in first');
+  }
+
+  const [result] = await db.query(
+    `
+    UPDATE bookings
+    SET status = ?
+    WHERE id = ? AND vendor_id = ?
+    `,
+    [status, bookingId, vendorId]
+  );
+
+  return {
+    booking_id: bookingId,
+    old_status: booking.status,
+    new_status: status
   };
 };

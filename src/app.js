@@ -31,6 +31,7 @@ const vendorVenueRoutes = require('./modules/vendor-venues/vendor-venues.routes'
 const vendorBookingRoutes = require('./modules/vendor-bookings/vendor-booking.routes');
 const vendorReportRoutes = require('./modules/vendor-reports/vendor-report.routes');
 const vendorRoomRoutes = require('./modules/vendor-rooms/vendor-room.routes');
+const customerBookingRoutes = require('./modules/customer-bookings/customer-booking.routes');
 
 
 // =======================
@@ -58,6 +59,15 @@ app.use('/api/vendor-venues', vendorVenueRoutes);
 app.use('/api/vendor-bookings', vendorBookingRoutes);
 app.use('/api/vendor-reports', vendorReportRoutes);
 app.use('/api/vendor-rooms', vendorRoomRoutes);
+app.use('/api/customer-bookings', customerBookingRoutes);
+app.use('/api/payments', require('./modules/payments/payment.routes'));
+app.use('/api/financial-documents', require('./modules/financial-documents/financial-document.routes'));
+app.use('/api/vendor-finance', require('./modules/vendor-finance/vendor-finance.routes'));
+app.use('/api/vendor-payouts', require('./modules/vendor-payouts/vendor-payout.routes'));
+app.use('/api/admin/payouts', require('./modules/admin-payouts/admin-payout.routes'));
+app.use('/api/admin', require('./modules/admin/admin.routes'));
+app.use('/api/admin/payouts', require('./modules/admin/admin-payout.routes'));
+
 
 // =======================
 // HEALTH CHECK
