@@ -1,214 +1,376 @@
-const service =
-  require('./vendor-booking.service');
+const service = require("./vendor-booking.service");
+const dashboard =
+  require("./vendor-booking.dashboard.service");
 
-/**
- * GET ALL BOOKINGS
- */
-exports.getBookings =
-  async (req, res) => {
 
-    try {
 
-      const data =
-        await service.getVendorBookings(
-          req.user.vendor_id
-        );
+// ===============================
+// GET ALL VENDOR BOOKINGS
+// ===============================
 
-      res.json({
-        success: true,
-        data
-      });
+exports.getBookings = async (req, res) => {
 
-    } catch (error) {
+  try {
 
-      res.status(400).json({
-        success: false,
-        error: error.message
-      });
 
-    }
+    const vendorId =
+      req.user.vendor_id || null;
 
-  };
 
-/**
- * GET BOOKING BY ID
- */
+    const data =
+      await service.getVendorBookings(
+        vendorId
+      );
+
+
+    res.json({
+
+      success: true,
+
+      count: data.length,
+
+      data
+
+    });
+
+
+  } catch (error) {
+
+    res.status(400).json({
+
+      success: false,
+
+      error: error.message
+
+    });
+
+  }
+
+
+};
+
+
+
+
+
+// ===============================
+// GET SINGLE BOOKING
+// ===============================
+
 exports.getBookingById =
   async (req, res) => {
 
     try {
 
-      const booking =
-        await service.getBookingById(
+
+      const data =
+        await service.getBookingDetails(
+
           req.params.id,
-          req.user.vendor_id
+
+          req.user.vendor_id || null
+
         );
 
+
+
       res.json({
+
         success: true,
-        data: booking
+
+        data
+
       });
+
 
     } catch (error) {
 
+
       res.status(400).json({
+
         success: false,
+
         error: error.message
+
       });
+
 
     }
 
   };
 
-/**
- * APPROVE BOOKING
- */
+
+
+
+
+// ===============================
+// APPROVE BOOKING
+// ===============================
+
 exports.approveBooking =
   async (req, res) => {
 
+
     try {
 
-      const result =
+
+      const data =
         await service.approveBooking(
+
           req.params.id,
-          req.user.vendor_id
+
+          req.user.vendor_id || null,
+
+          req.user.id
+
         );
 
+
+
       res.json({
+
         success: true,
-        data: result
+
+        data
+
       });
+
 
     } catch (error) {
 
+
       res.status(400).json({
+
         success: false,
+
         error: error.message
+
       });
+
 
     }
 
+
+
   };
 
-/**
- * REJECT BOOKING
- */
+
+
+
+
+// ===============================
+// REJECT BOOKING
+// ===============================
+
 exports.rejectBooking =
   async (req, res) => {
 
+
     try {
 
-      const result =
+
+      const data =
         await service.rejectBooking(
+
           req.params.id,
-          req.user.vendor_id
+
+          req.user.vendor_id || null,
+
+          req.user.id
+
         );
 
+
+
       res.json({
+
         success: true,
-        data: result
+
+        data
+
       });
+
 
     } catch (error) {
 
+
       res.status(400).json({
+
         success: false,
+
         error: error.message
+
       });
 
+
     }
+
+
 
   };
 
-/**
- * CHECK IN GUEST
- */
-exports.checkInGuest =
+
+
+
+
+// ===============================
+// CHECK IN
+// ===============================
+
+exports.checkIn =
   async (req, res) => {
+
 
     try {
 
-      const result =
-        await service.updateBookingStatus(
+
+      const data =
+        await service.checkInGuest(
+
           req.params.id,
-          req.user.vendor_id,
-          'checked_in'
+
+          req.user.vendor_id || null,
+
+          req.user.id
+
         );
 
+
+
       res.json({
+
         success: true,
-        data: result
+
+        data
+
       });
+
 
     } catch (error) {
 
       res.status(400).json({
+
         success: false,
+
         error: error.message
+
       });
 
+
     }
+
 
   };
 
-/**
- * CHECK OUT GUEST
- */
-exports.checkOutGuest =
+
+
+
+
+// ===============================
+// CHECK OUT
+// ===============================
+
+exports.checkOut =
   async (req, res) => {
+
 
     try {
 
-      const result =
-        await service.updateBookingStatus(
+
+      const data =
+        await service.checkOutGuest(
+
           req.params.id,
-          req.user.vendor_id,
-          'completed'
+
+          req.user.vendor_id || null,
+
+          req.user.id
+
         );
 
+
+
       res.json({
+
         success: true,
-        data: result
+
+        data
+
       });
+
 
     } catch (error) {
 
+
       res.status(400).json({
+
         success: false,
+
         error: error.message
+
       });
 
+
     }
+
 
   };
 
-/**
- * GENERIC STATUS UPDATE
- */
-exports.updateBookingStatus =
+
+
+
+
+
+// ===============================
+// DASHBOARD
+// ===============================
+
+exports.dashboard =
   async (req, res) => {
+
 
     try {
 
-      const result =
-        await service.updateBookingStatus(
-          req.params.id,
-          req.user.vendor_id,
-          req.body.status
+
+      const vendorId =
+        req.user.roles.includes("admin")
+          ?
+          null
+          :
+          req.user.vendor_id;
+
+
+
+      const data =
+        await dashboard.getDashboard(
+          vendorId
         );
 
+
+
       res.json({
+
         success: true,
-        data: result
+
+        data
+
       });
+
 
     } catch (error) {
 
+
       res.status(400).json({
+
         success: false,
+
         error: error.message
+
       });
 
+
     }
+
+
 
   };

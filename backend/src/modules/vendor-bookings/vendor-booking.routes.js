@@ -1,73 +1,67 @@
-const express = require('express');
-const router = express.Router();
-
-const auth =
-  require('../../middleware/auth.middleware');
+const router = require("express").Router();
 
 const controller =
-  require('./vendor-booking.controller');
+  require("./vendor-booking.controller");
 
-/**
- * GET ALL BOOKINGS FOR VENDOR
- */
+const auth =
+  require("../../middleware/auth.middleware");
+
+
+
 router.get(
-  '/',
+  "/",
   auth,
   controller.getBookings
 );
 
-/**
- * GET SINGLE BOOKING
- */
+
+
 router.get(
-  '/:id',
+  "/dashboard",
+  auth,
+  controller.dashboard
+);
+
+
+
+router.get(
+  "/:id",
   auth,
   controller.getBookingById
 );
 
-/**
- * APPROVE BOOKING
- */
+
+
 router.put(
-  '/:id/approve',
+  "/:id/approve",
   auth,
   controller.approveBooking
 );
 
-/**
- * REJECT BOOKING
- */
+
+
 router.put(
-  '/:id/reject',
+  "/:id/reject",
   auth,
   controller.rejectBooking
 );
 
-/**
- * CHECK-IN GUEST
- */
+
+
 router.put(
-  '/:id/checkin',
+  "/:id/checkin",
   auth,
-  controller.checkInGuest
+  controller.checkIn
 );
 
-/**
- * CHECK-OUT GUEST
- */
+
+
 router.put(
-  '/:id/checkout',
+  "/:id/checkout",
   auth,
-  controller.checkOutGuest
+  controller.checkOut
 );
 
-/**
- * GENERIC STATUS UPDATE (optional fallback)
- */
-router.put(
-  '/:id/status',
-  auth,
-  controller.updateBookingStatus
-);
+
 
 module.exports = router;

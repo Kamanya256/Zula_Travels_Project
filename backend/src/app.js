@@ -51,6 +51,15 @@ const vendorPayoutRoutes = require("./modules/vendor-payouts/vendor-payout.route
 const analyticsRoutes = require("./modules/analytics/analytics.routes");
 const authRoutes = require("./modules/auth/auth.routes");
 const dashboardRoutes = require("./modules/dashboard/dashboard.routes");
+const vendorWalletRoutes = require("./modules/vendor-wallet/vendor-wallet.routes");
+const websiteRoutes = require("./modules/website/website.routes");
+const templateRoutes = require("./modules/website/template.routes");
+const generatorRoutes = require("./modules/website/generator.routes");
+const pageRoutes = require("./modules/website/page.routes");
+const sectionRoutes = require("./modules/website/section.routes");
+const publicWebsiteRoutes = require("./modules/public-website/public-website.routes");
+const previewRoutes = require("./modules/website-preview/website-preview.routes");
+const vendorWebsiteRoutes = require("./modules/vendor-website/vendor-website.routes");
 console.log("✓ Auth routes loaded");
 
 
@@ -90,7 +99,16 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/admin/payouts", payoutRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-console.log("✓ /api/auth registered");
+app.use("/api/vendor-wallet", vendorWalletRoutes);
+app.use("/api/websites", websiteRoutes);
+app.use("/api/website-templates", templateRoutes);
+app.use("/api/websites", generatorRoutes);
+app.use("/api/websites", pageRoutes);
+app.use("/api/websites", sectionRoutes);
+app.use("/api/public", publicWebsiteRoutes);
+app.use("/api/preview", previewRoutes);
+app.use("/api/vendor/website", vendorWebsiteRoutes);
+console.log("✓ /api/website-templates registered");
 
 
 // =======================
