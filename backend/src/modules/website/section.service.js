@@ -76,9 +76,11 @@ exports.getPageSections =
             ...section,
 
             content_json:
-                JSON.parse(
-                    section.content_json
-                )
+                section.content_json
+                    ?
+                    JSON.parse(section.content_json)
+                    :
+                    {}
 
         }));
 
@@ -110,21 +112,50 @@ exports.getSection =
             );
 
 
-        if (section) {
 
-            section.content_json =
-                JSON.parse(
-                    section.content_json
-                );
+        if (!section) {
+
+            throw new Error(
+                "Section not found."
+            );
 
         }
 
 
+
+        if (section.content_json) {
+
+
+            try {
+
+
+                section.content_json =
+                    JSON.parse(
+                        section.content_json
+                    );
+
+
+            }
+            catch (error) {
+
+
+                section.content_json = {};
+
+            }
+
+
+        }
+        else {
+
+
+            section.content_json = {};
+
+
+        }
+
         return section;
 
     };
-
-
 
 // =====================================
 // CREATE SECTION
@@ -220,45 +251,83 @@ exports.updateSection =
     ) => {
 
 
+        if (!data || Object.keys(data).length === 0) {
+
+            throw new Error(
+                "No update data provided."
+            );
+
+        }
+
+
+
+        // Convert JSON content
+
         if (data.content_json) {
+
 
             data.content_json =
                 JSON.stringify(
                     data.content_json
                 );
 
+
         }
 
 
 
-        await db.query(
+        // Manual editing means AI content changed
 
-            `
-UPDATE website_sections
-SET ?
-WHERE id=?
-`,
+        if (data.content_json) {
 
-            [
-                data,
-                id
-            ]
+            data.ai_generated = 0;
 
-        );
+        }
+
+
+
+
+        const [result] =
+            await db.query(
+
+                `
+        UPDATE website_sections
+
+        SET ?
+
+        WHERE id=?
+
+        `,
+
+                [
+                    data,
+                    id
+                ]
+
+            );
+
+
+
+        if (result.affectedRows === 0) {
+
+            throw new Error(
+                "Section not found."
+            );
+
+        }
 
 
 
         return {
 
+
             message:
-                "Section updated"
+                "Section updated successfully."
 
         };
 
 
     };
-
-
 
 // =====================================
 // CHANGE VISIBILITY

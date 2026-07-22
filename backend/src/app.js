@@ -60,6 +60,11 @@ const sectionRoutes = require("./modules/website/section.routes");
 const publicWebsiteRoutes = require("./modules/public-website/public-website.routes");
 const previewRoutes = require("./modules/website-preview/website-preview.routes");
 const vendorWebsiteRoutes = require("./modules/vendor-website/vendor-website.routes");
+const vendorDashboardRoutes = require("./modules/vendor-dashboard/vendor-dashboard.routes");
+const websiteEditorRoutes = require("./modules/website-editor/website-editor.routes");
+const templateGeneratorRoutes = require("./modules/website/template-generator.routes");
+const editorRoutes = require("./modules/website/editor.routes");
+
 console.log("✓ Auth routes loaded");
 
 
@@ -108,6 +113,10 @@ app.use("/api/websites", sectionRoutes);
 app.use("/api/public", publicWebsiteRoutes);
 app.use("/api/preview", previewRoutes);
 app.use("/api/vendor/website", vendorWebsiteRoutes);
+app.use("/api/vendor/dashboard", vendorDashboardRoutes);
+app.use("/api/vendor/editor", websiteEditorRoutes);
+app.use("/api/template-generator", templateGeneratorRoutes);
+app.use("/api/websites", editorRoutes);
 console.log("✓ /api/website-templates registered");
 
 

@@ -1,80 +1,114 @@
-const service =
-    require("./page.service");
+const service = require("./page.service");
+
+
+// =====================================
+// GET ALL WEBSITE PAGES
+// =====================================
+
+exports.getPages = async (req, res) => {
+
+    try {
+
+        const pages =
+            await service.getPages(
+                req.params.websiteId
+            );
+
+
+        res.json({
+
+            success: true,
+
+            data: pages
+
+        });
+
+
+    } catch (error) {
+
+
+        res.status(500).json({
+
+            success: false,
+
+            error: error.message
+
+        });
+
+
+    }
+
+};
 
 
 
-exports.getPages =
-    async (req, res) => {
 
-        try {
+// =====================================
+// CREATE WEBSITE PAGE
+// =====================================
 
-            const data =
-                await service.getPages(
-                    req.params.websiteId
-                );
+exports.createPage = async (req, res) => {
 
 
-            res.json({
-
-                success: true,
-                data
-
-            });
+    try {
 
 
-        } catch (error) {
-
-            res.status(500).json({
-
-                success: false,
-                error: error.message
-
-            });
-
-        }
-
-    };
+        const pageData = {
 
 
+            website_id:
+                req.params.websiteId,
 
 
-exports.createPage =
-    async (req, res) => {
+            title:
+                req.body.title,
 
 
-        try {
+            slug:
+                req.body.slug,
 
 
-            const data =
-                await service.createPage(
+            page_type:
+                req.body.page_type
 
-                    req.params.websiteId,
 
-                    req.body
-
-                );
+        };
 
 
 
-            res.json({
-
-                success: true,
-                data
-
-            });
+        const page =
+            await service.createPage(
+                pageData
+            );
 
 
 
-        } catch (error) {
+        res.json({
 
-            res.status(500).json({
+            success: true,
 
-                success: false,
-                error: error.message
+            message:
+                "Page created successfully.",
 
-            });
+            data: page
 
-        }
+        });
 
 
-    };
+
+    } catch (error) {
+
+
+        res.status(500).json({
+
+            success: false,
+
+            error: error.message
+
+        });
+
+
+    }
+
+
+};

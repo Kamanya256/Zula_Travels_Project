@@ -11,7 +11,10 @@ const auth =
 
 
 
-// GET SECTIONS
+
+// =====================================
+// GET ALL SECTIONS OF PAGE
+// =====================================
 
 router.get(
 
@@ -25,7 +28,27 @@ router.get(
 
 
 
+
+// =====================================
+// GET SINGLE SECTION
+// =====================================
+
+router.get(
+
+    "/sections/:id",
+
+    auth,
+
+    controller.getSection
+
+);
+
+
+
+
+// =====================================
 // CREATE SECTION
+// =====================================
 
 router.post(
 
@@ -39,7 +62,10 @@ router.post(
 
 
 
-// UPDATE SECTION
+
+// =====================================
+// UPDATE SECTION CONTENT
+// =====================================
 
 router.put(
 
@@ -53,7 +79,10 @@ router.put(
 
 
 
-// CHANGE STATUS
+
+// =====================================
+// CHANGE VISIBILITY STATUS
+// =====================================
 
 router.patch(
 
@@ -67,7 +96,10 @@ router.patch(
 
 
 
-// DELETE
+
+// =====================================
+// DELETE SECTION
+// =====================================
 
 router.delete(
 
@@ -78,6 +110,24 @@ router.delete(
     controller.deleteSection
 
 );
+
+
+
+
+// =====================================
+// REORDER PAGE SECTIONS
+// =====================================
+
+router.put(
+
+    "/pages/:pageId/sections/reorder",
+
+    auth,
+
+    controller.reorderSections
+
+);
+
 
 
 module.exports = router;

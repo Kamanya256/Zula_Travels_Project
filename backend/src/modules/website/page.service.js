@@ -1,6 +1,5 @@
 const db = require("../../config/db");
 
-
 // =====================================
 // GET ALL WEBSITE PAGES
 // =====================================
@@ -26,8 +25,6 @@ exports.getPages = async (websiteId) => {
 
 };
 
-
-
 // =====================================
 // GET SINGLE PAGE
 // =====================================
@@ -52,32 +49,24 @@ exports.getPageById = async (id) => {
 
 };
 
-
-
 // =====================================
 // CREATE PAGE
 // =====================================
 
-exports.createPage = async (
-    websiteId,
-    data
-) => {
-
+exports.createPage = async (data) => {
 
     const {
-
+        website_id,
         title,
         slug,
         page_type
-
     } = data;
 
+    // Create page first
 
+    const [result] = await db.query(
 
-    const [result] =
-        await db.query(
-
-            `
+        `
         INSERT INTO website_pages
         (
             website_id,
@@ -86,99 +75,253 @@ exports.createPage = async (
             page_type
         )
 
-        VALUES
-        (?,?,?,?)
+        VALUES(?,?,?,?)
+
+        `,
+
+        [
+            website_id,
+            title,
+            slug,
+            page_type
+        ]
+
+    );
+
+    const pageId = result.insertId;
+
+
+
+    const defaultSections = {
+
+
+        gallery: [
+            "gallery_grid",
+            "testimonials"
+        ],
+
+
+        rooms: [
+            "room_listing",
+            "booking"
+        ],
+
+
+        restaurant: [
+            "menu",
+            "gallery"
+        ],
+
+
+        hospital: [
+            "doctors",
+            "services",
+            "gallery"
+        ],
+
+
+        tour_operator: [
+            "packages",
+            "destinations",
+            "gallery",
+            "booking"
+        ],
+
+
+        car_rental: [
+            "fleet",
+            "drivers",
+            "booking"
+        ],
+
+
+        contact: [
+            "contact_form",
+            "map"
+        ],
+
+
+        homepage: [
+            "hero",
+            "about",
+            "gallery"
+        ]
+
+    };
+
+    const sections =
+        defaultSections[page_type]
+        ||
+        [
+            "hero",
+            "content",
+            "gallery"
+        ];
+
+    let order = 1;
+
+    for (const section of sections) {
+
+
+        await db.query(
+
+            `
+        INSERT INTO website_sections
+
+        (
+        page_id,
+        section_name,
+        section_type,
+        content_json,
+        sort_order,
+        status
+        )
+
+        VALUES(?,?,?,?,?,'active')
+
         `,
 
             [
-                websiteId,
-                title,
-                slug,
-                page_type || "custom"
-            ]
 
-        );
+                pageId,
 
+                section,
+
+                section,
+
+
+                JSON.stringify({
+
+                    title: section,
+
+                    subtitle: "",
+
+                    description:
+                        "Content will be generated.",
+
+                    images: [],
+
+                    videos: [],
+
+                    items: [],
+
+                    settings: {
+
+                        background_color: "#ffffff",
+
+                        text_color: "#000000",
+
+                        visible: true
+
+                    }
+
+                }),
+
+
+                order++
+
+            ]);
+
+
+    }
 
     return {
 
-        id:
-            result.insertId,
+        id: pageId,
 
         title,
+
         slug
 
     };
 
+
 };
-
-
 
 // =====================================
 // UPDATE PAGE
 // =====================================
 
-exports.updatePage =
-    async (
-        id,
-        data
-    ) => {
+exports.updatePage = async (id, data) => {
 
 
-        await db.query(
+    if (!data || Object.keys(data).length === 0) {
 
-            `
-UPDATE website_pages
-SET ?
-WHERE id=?
-`,
-            [
-                data,
-                id
-            ]
-
+        throw new Error(
+            "No update data provided."
         );
 
+    }
 
-        return {
+    await db.query(
 
-            message:
-                "Page updated"
+        `
+        UPDATE website_pages
+        SET ?
+        WHERE id=?
+        `,
 
-        };
+        [
+            data,
+            id
+        ]
 
+    );
+
+    return {
+
+        message:
+            "Page updated successfully."
 
     };
-
-
-
+};
 // =====================================
 // DELETE PAGE
 // =====================================
 
-exports.deletePage =
-    async (id) => {
+exports.deletePage = async (id) => {
 
 
-        await db.query(
+    // First remove sections belonging to page
 
-            `
-DELETE FROM website_pages
-WHERE id=?
-`,
-            [
-                id
-            ]
+    await db.query(
 
-        );
+        `
+        DELETE FROM website_sections
+        WHERE page_id=?
+        `,
+
+        [
+            id
+        ]
+
+    );
 
 
-        return {
 
-            message:
-                "Page deleted"
+    // Then remove the page
 
-        };
+    await db.query(
 
+        `
+        DELETE FROM website_pages
+        WHERE id=?
+        `,
+
+        [
+            id
+        ]
+
+    );
+
+
+
+    return {
+
+        message:
+            "Page and sections deleted successfully."
 
     };
+
+
+};

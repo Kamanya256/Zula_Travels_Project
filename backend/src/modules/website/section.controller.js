@@ -3,7 +3,9 @@ const service =
 
 
 
+// =====================================
 // GET PAGE SECTIONS
+// =====================================
 
 exports.getPageSections =
     async (req, res) => {
@@ -17,6 +19,50 @@ exports.getPageSections =
                 );
 
 
+            res.json({
+
+                success: true,
+
+                data
+
+            });
+
+
+        }
+        catch (error) {
+
+
+            res.status(500).json({
+
+                success: false,
+
+                error: error.message
+
+            });
+
+
+        }
+
+    };
+
+
+
+
+// =====================================
+// GET SINGLE SECTION
+// =====================================
+
+exports.getSection =
+    async (req, res) => {
+
+        try {
+
+
+            const data =
+                await service.getSection(
+                    req.params.id
+                );
+
 
             res.json({
 
@@ -27,7 +73,9 @@ exports.getPageSections =
             });
 
 
-        } catch (error) {
+        }
+        catch (error) {
+
 
             res.status(500).json({
 
@@ -37,6 +85,7 @@ exports.getPageSections =
 
             });
 
+
         }
 
     };
@@ -44,7 +93,10 @@ exports.getPageSections =
 
 
 
-// CREATE
+
+// =====================================
+// CREATE SECTION
+// =====================================
 
 exports.createSection =
     async (req, res) => {
@@ -73,6 +125,7 @@ exports.createSection =
             });
 
 
+
         }
         catch (error) {
 
@@ -93,7 +146,11 @@ exports.createSection =
 
 
 
-// UPDATE
+
+
+// =====================================
+// UPDATE SECTION
+// =====================================
 
 exports.updateSection =
     async (req, res) => {
@@ -122,7 +179,9 @@ exports.updateSection =
             });
 
 
-        } catch (error) {
+
+        }
+        catch (error) {
 
 
             res.status(500).json({
@@ -136,11 +195,17 @@ exports.updateSection =
 
         }
 
+
     };
 
 
 
-// STATUS
+
+
+
+// =====================================
+// UPDATE STATUS
+// =====================================
 
 exports.updateStatus =
     async (req, res) => {
@@ -169,7 +234,10 @@ exports.updateStatus =
             });
 
 
-        } catch (error) {
+
+        }
+        catch (error) {
+
 
             res.status(500).json({
 
@@ -179,13 +247,20 @@ exports.updateStatus =
 
             });
 
+
         }
+
 
     };
 
 
 
-// DELETE
+
+
+
+// =====================================
+// DELETE SECTION
+// =====================================
 
 exports.deleteSection =
     async (req, res) => {
@@ -196,7 +271,9 @@ exports.deleteSection =
 
             const data =
                 await service.deleteSection(
+
                     req.params.id
+
                 );
 
 
@@ -210,7 +287,10 @@ exports.deleteSection =
             });
 
 
-        } catch (error) {
+
+        }
+        catch (error) {
+
 
             res.status(500).json({
 
@@ -220,6 +300,61 @@ exports.deleteSection =
 
             });
 
+
         }
+
+
+    };
+
+
+
+
+
+
+// =====================================
+// REORDER SECTIONS
+// =====================================
+
+exports.reorderSections =
+    async (req, res) => {
+
+
+        try {
+
+
+            const data =
+                await service.reorderSections(
+
+                    req.body.sections
+
+                );
+
+
+
+            res.json({
+
+                success: true,
+
+                data
+
+            });
+
+
+
+        }
+        catch (error) {
+
+
+            res.status(500).json({
+
+                success: false,
+
+                error: error.message
+
+            });
+
+
+        }
+
 
     };
